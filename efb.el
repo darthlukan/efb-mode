@@ -1,9 +1,11 @@
-;;; efb.el --- An Electronic Flight Bag major mode in Emacs
+;; -*- lexical-binding: t; -*-
+
+;;; efb.el --- An Electronic Flight Bag major mode
 ;; Copyright (C) 2025 Brian Tomlinson
 
-;; Author: Brian Tomlinson <briantomlinson at duck dot com>
+;; Author: Brian Tomlinson <darthlukan at gmail dot com>
 ;; Version: 0.0.1
-;; Package-Requires: ((nil "ver"))
+;; Package-Requires: ((emacs "24.1"))
 ;; Keywords: efb, flight-bag, flight-planner, aviation
 ;; URL: https://github.com/darthlukan/efb-mode
 
@@ -18,11 +20,10 @@
   (switch-to-buffer "*efb*")
   (efb-mode))
 
-(define-derived-mode efb-mode
-  custom-mode "efb"
+(define-derived-mode efb-mode text-mode "efb"
   "Major mode implementing a basic Electronic Flight Bag."
   (setq-local efb-departure-icao nil)
   (setq-local efb-arrival-icao nil))
 
-(provide 'efb-mode)
+(provide 'efb)
 ;;; efb.el ends here
