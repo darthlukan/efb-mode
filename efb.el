@@ -34,23 +34,24 @@
 (defvar-local efb-weather-base-url "https://aviationweather.gov/api/data/")
 (defvar-local efb-weather-type-metar "metar")
 (defvar-local efb-weather-icao-key "ids")
+(defvar-local efb-depart-metar "")
+(defvar-local efb-arrive-metar "")
 
 (defun efb-get-metar (icao)
   "Retrieve and return the METAR string for ICAO."
-  (request
-    (format "%s/%s?%s=%s" efb-weather-base-url efb-weather-type-metar efb-weather-icao-key icao)
-    :type "GET"
-    :parser 'buffer-string
-    :success (cl-function
-              (lambda (&key data &allow-other-keys)
-                (progn
-                  (message "Got: %s" data)
-                  data)))
-    :error (cl-function
-            (lambda (&rest args &key error-thrown &allow-other-keys)
-              (progn
-                (message "Error: %s" error-thrown)
-                error-thrown)))))
+  (setq-local efb-resp (request
+                         (format "%s/%s?%s=%s" efb-weather-base-url efb-weather-type-metar efb-weather-icao-key icao)
+                         :sync t
+                         :type "GET"
+                         :parser 'buffer-string
+                         :success (cl-function
+                                   (lambda (&key data &allow-other-keys)
+                                     data))
+                         :error (cl-function
+                                 (lambda (&rest args &key error-thrown &allow-other-keys)
+                                   (message "Error: %s" error-thrown)
+                                   error-thrown))))
+  (request-response-data efb-resp))
 
 (defun efb-get-taf (icao)
   "Retrieve and return the TAF string for ICAO."
@@ -66,14 +67,14 @@
 
 (defun efb-action (depart-widget arrival-widget)
   "Display the value of DEPART-WIDGET and ARRIVAL-WIDGET."
-  (setq-local dep-icao (widget-value depart-widget))
-  (setq-local arr-icao (widget-value arrival-widget))
-  (setq-local dep-metar (efb-get-metar dep-icao))
-  (setq-local arr-metar (efb-get-metar arr-icao))
-  (progn
-    (message "Departing: %s, Arriving: %s" dep-icao arr-icao)
-    (message "Dep METAR: %s" dep-metar)
-    (message "Arr METAR: %s" arr-metar)))
+  (setq-local efb-depart-icao (widget-value depart-widget))
+  (setq-local efb-arrive-icao (widget-value arrival-widget))
+  (setq-local efb-depart-metar (efb-get-metar efb-depart-icao))
+  (setq-local efb-arrive-metar (efb-get-metar efb-arrive-icao))
+  (message "Departing: %s, Arriving: %s" efb-depart-icao efb-arrive-icao)
+  (message "Departure METAR: %s" efb-depart-metar)
+  (message "Arrival METAR: %s" efb-arrive-metar)
+  (list efb-depart-metar efb-arrive-metar))
 
 (define-derived-mode efb-mode text-mode "efb"
   "Major mode implementing a basic Electronic Flight Bag."
