@@ -1,5 +1,4 @@
-;; -*- lexical-binding: t; -*-
-;;; efb.el --- An Electronic Flight Bag major mode
+;;; efb.el --- An Electronic Flight Bag major mode -*- lexical-binding: t; -*-
 ;; Copyright (C) 2025 Brian Tomlinson
 
 ;; Author: Brian Tomlinson <darthlukan at gmail dot com>
@@ -19,23 +18,24 @@
 (eval-when-compile
   (require 'wid-edit))
 
+(defconst efb-buffer "*efb*")
+(defvar-local efb-weather-base-url "https://aviationweather.gov/api/data/")
+(defvar-local efb-weather-type-metar "metar")
+(defvar-local efb-weather-icao-key "ids")
+(defvar-local efb-depart-metar "")
+(defvar-local efb-arrive-metar "")
+
 ;;;###autoload
 (defun efb-load ()
   "Switch to *efb* buffer and start VFR flight planning."
   (interactive)
-  (switch-to-buffer "*efb*")
+  (switch-to-buffer efb-buffer)
   (kill-all-local-variables)
   (let ((inhibit-read-only t))
     (erase-buffer))
   (remove-overlays)
   (widget-insert "EFB Mode: Plan your VFR Flight.\n\n")
   (efb-mode))
-
-(defvar-local efb-weather-base-url "https://aviationweather.gov/api/data/")
-(defvar-local efb-weather-type-metar "metar")
-(defvar-local efb-weather-icao-key "ids")
-(defvar-local efb-depart-metar "")
-(defvar-local efb-arrive-metar "")
 
 (defun efb-get-metar (icao)
   "Retrieve and return the METAR string for ICAO."
